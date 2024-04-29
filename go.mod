@@ -7,6 +7,7 @@ toolchain go1.22.1
 require (
 	github.com/cloverstd/tcping v0.1.1
 	github.com/getlantern/elevate v0.0.0-20220903142053-479ab992b264
+	github.com/google/uuid v1.6.0
 	github.com/sagernet/sing-box v1.8.12
 	github.com/sagernet/sing-dns v0.2.0-beta.16
 	github.com/shirou/gopsutil/v3 v3.24.3
@@ -42,7 +43,6 @@ require (
 	github.com/gofrs/uuid/v5 v5.1.0 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/google/pprof v0.0.0-20240424215950-a892ee059fd6 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.17.8 // indirect

@@ -4,6 +4,7 @@ import (
 	"client/backend/config"
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/option"
 	dns "github.com/sagernet/sing-dns"
@@ -18,7 +19,6 @@ func getOUt(peer *config.Peer) option.Outbound {
 	case "shadowsocks":
 		out = option.Outbound{
 			Type: "shadowsocks",
-			Tag:  fmt.Sprintf("ss-out-%s", peer.UUID),
 			ShadowsocksOptions: option.ShadowsocksOutboundOptions{
 				ServerOptions: option.ServerOptions{
 					Server:     peer.Addr,
@@ -39,7 +39,6 @@ func getOUt(peer *config.Peer) option.Outbound {
 	case "socks":
 		out = option.Outbound{
 			Type: "socks",
-			Tag:  fmt.Sprintf("socks-out-%s", peer.UUID),
 			SocksOptions: option.SocksOutboundOptions{
 				ServerOptions: option.ServerOptions{
 					Server:     peer.Addr,
@@ -56,7 +55,6 @@ func getOUt(peer *config.Peer) option.Outbound {
 	case "hysteria2":
 		out = option.Outbound{
 			Type: "hysteria2",
-			Tag:  fmt.Sprintf("hy2-out-%s", peer.UUID),
 			Hysteria2Options: option.Hysteria2OutboundOptions{
 				ServerOptions: option.ServerOptions{
 					Server:     peer.Addr,
@@ -77,12 +75,10 @@ func getOUt(peer *config.Peer) option.Outbound {
 	case "direct":
 		out = option.Outbound{
 			Type: "direct",
-			Tag:  "direct-out",
 		}
 	default:
 		out = option.Outbound{
 			Type: "vless",
-			Tag:  fmt.Sprintf("vless-out-%s", peer.UUID),
 			VLESSOptions: option.VLESSOutboundOptions{
 				ServerOptions: option.ServerOptions{
 					Server:     peer.Addr,
@@ -108,6 +104,7 @@ func getOUt(peer *config.Peer) option.Outbound {
 			},
 		}
 	}
+	out.Tag = uuid.New().String()
 	return out
 }
 func Client(gamePeer, httpPeer *config.Peer) (*box.Box, error) {
