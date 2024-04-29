@@ -123,7 +123,7 @@ func Client(gamePeer, httpPeer *config.Peer) (*box.Box, error) {
 				Servers: []option.DNSServerOptions{
 					{
 						Tag:      "proxyDns",
-						Address:  "8.8.8.8",
+						Address:  "https://1.1.1.1/dns-query",
 						Strategy: option.DomainStrategy(dns.DomainStrategyUseIPv4),
 					},
 					{
