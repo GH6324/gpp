@@ -107,7 +107,7 @@ func getOUt(peer *config.Peer) option.Outbound {
 	out.Tag = uuid.New().String()
 	return out
 }
-func Client(gamePeer, httpPeer *config.Peer) (*box.Box, error) {
+func Client(gamePeer, httpPeer *config.Peer, processList []string) (*box.Box, error) {
 	home, _ := os.UserHomeDir()
 	options := box.Options{
 		Context: context.Background(),
@@ -248,28 +248,6 @@ func Client(gamePeer, httpPeer *config.Peer) (*box.Box, error) {
 							Outbound: "dns_out",
 						},
 					},
-					{
-						Type: "default",
-						DefaultOptions: option.DefaultRule{
-							Network:  option.Listable[string]{"udp"},
-							Port:     []uint16{443},
-							Outbound: "block",
-						},
-					},
-					{
-						Type: "default",
-						DefaultOptions: option.DefaultRule{
-							Geosite:  option.Listable[string]{"cn"},
-							Outbound: "direct",
-						},
-					},
-					{
-						Type: "default",
-						DefaultOptions: option.DefaultRule{
-							GeoIP:    option.Listable[string]{"cn", "private"},
-							Outbound: "direct",
-						},
-					},
 				},
 			},
 			Outbounds: []option.Outbound{
@@ -288,10 +266,52 @@ func Client(gamePeer, httpPeer *config.Peer) (*box.Box, error) {
 			},
 		},
 	}
-	if httpPeer != nil && httpPeer.Name != gamePeer.Name {
-		out := getOUt(httpPeer)
-		options.Options.Outbounds = append(options.Options.Outbounds, out)
-		options.Options.Route.Rules = append(options.Options.Route.Rules, option.Rule{Type: "default", DefaultOptions: option.DefaultRule{Protocol: option.Listable[string]{"http", "quic", "tls"}, Outbound: out.Tag}})
+	if processList != nil && len(processList) > 0 {
+		options.Options.Route.Rules = append(options.Options.Route.Rules, option.Rule{
+			Type: "logical",
+			LogicalOptions: option.LogicalRule{
+				Rules: []option.Rule{
+					{
+						Type: "default",
+						DefaultOptions: option.DefaultRule{
+							ProcessPath: processList,
+						},
+					},
+				},
+				Outbound: "direct",
+				Invert:   true,
+			},
+		})
+	} else {
+		options.Options.Route.Rules = append(options.Options.Route.Rules, []option.Rule{
+			{
+				Type: "default",
+				DefaultOptions: option.DefaultRule{
+					Network:  option.Listable[string]{"udp"},
+					Port:     []uint16{443},
+					Outbound: "block",
+				},
+			},
+			{
+				Type: "default",
+				DefaultOptions: option.DefaultRule{
+					Geosite:  option.Listable[string]{"cn"},
+					Outbound: "direct",
+				},
+			},
+			{
+				Type: "default",
+				DefaultOptions: option.DefaultRule{
+					GeoIP:    option.Listable[string]{"cn", "private"},
+					Outbound: "direct",
+				},
+			},
+		}...)
+		if httpPeer != nil && httpPeer.Name != gamePeer.Name {
+			out := getOUt(httpPeer)
+			options.Options.Outbounds = append(options.Options.Outbounds, out)
+			options.Options.Route.Rules = append(options.Options.Route.Rules, option.Rule{Type: "default", DefaultOptions: option.DefaultRule{Protocol: option.Listable[string]{"http", "quic", "tls"}, Outbound: out.Tag}})
+		}
 	}
 	var instance, err = box.New(options)
 	if err != nil {
