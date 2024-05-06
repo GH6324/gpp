@@ -20,18 +20,20 @@ import (
 
 // App struct
 type App struct {
-	ctx      context.Context
-	conf     *config.Config
-	gamePeer *config.Peer
-	httpPeer *config.Peer
-	box      *box.Box
+	ctx         context.Context
+	conf        *config.Config
+	gamePeer    *config.Peer
+	httpPeer    *config.Peer
+	box         *box.Box
+	processList []string
 }
 
 // NewApp creates a new App application struct
 func NewApp() *App {
 	conf := config.Config{}
 	app := App{
-		conf: &conf,
+		conf:        &conf,
+		processList: make([]string, 0),
 	}
 	return &app
 }
@@ -189,7 +191,7 @@ func (a *App) Start() string {
 		return "running"
 	}
 	var err error
-	a.box, err = client.Client(a.gamePeer, a.httpPeer)
+	a.box, err = client.Client(a.gamePeer, a.httpPeer, a.processList)
 	if err != nil {
 		return err.Error()
 	}
