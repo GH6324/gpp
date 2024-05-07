@@ -7,6 +7,8 @@ read -p "请输入监听地址（默认0.0.0.0）: " LISTEN_ADDRESS
 LISTEN_ADDRESS=${LISTEN_ADDRESS:-"0.0.0.0"}
 read -p "请输入监听端口（默认5123）: " LISTEN_PORT
 LISTEN_PORT=${LISTEN_PORT:-"5123"}
+read -p "请输入当前服务器的入口IP: " NET_IP
+NET_IP=${NET_IP:-"127.0.0.1"}
 echo "请选择一个选项："
 echo "1) shadowsocks"
 echo "2) socks"
@@ -32,6 +34,7 @@ echo "您选择的协议为: $PROTOCOL"
 echo "您输入的监听地址为: $LISTEN_ADDRESS"
 echo "您输入的监听端口为: $LISTEN_PORT"
 echo "安装路径为: $INSTALL_PATH"
+echo "当前服务器的入口IP为: $NET_IP"
 # 检查目录是否存在，如果不存在则创建
 if [ ! -d "$INSTALL_PATH" ]; then
   mkdir -p "$INSTALL_PATH"
@@ -109,3 +112,7 @@ EOF
 chmod +x run.sh
 
 echo "安装完成,请执行 ${INSTALL_PATH}/run.sh start 启动服务端,执行 ${INSTALL_PATH}/run.sh stop 停止服务端"
+#fmt.Sprintf("gpp://%s@%s:%d/%s", config.Protocol, ipStr, config.Port, config.UUID
+result="gpp://$PROTOCOL@$NET_IP:$LISTEN_PORT/$UUID"
+encoded_result=$(echo -n $result | base64)
+echo "导入Token：${encoded_result}"
